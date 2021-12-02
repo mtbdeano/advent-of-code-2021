@@ -14,7 +14,7 @@ fn main() {
     let lines = lines_from_stdio();
     let mut depth = 0;
     let mut position = 0;
-
+    let mut aim = 0;
 
     for line in lines {
         let mut split = line.split(" ");
@@ -28,19 +28,23 @@ fn main() {
         match first_word {
             Some("forward") => {
                 position += distance;
+                depth += aim * distance;
             },
             Some("backward") => {
                 position -= distance;
+                depth -= aim * distance;
             },
             Some("up") => {
-                depth -= distance;
+                // depth -= distance;
+                aim -= distance;
             },
             Some("down") => {
-                depth += distance;
+                // depth += distance;
+                aim += distance;
             },
             Some(&_) | None => {},
         }
-        println!("distance {:?} depth {:?}", position, depth);
+        println!("{:?} {:?} => distance {:?} depth {:?} aim {:?}", first_word, distance, position, depth, aim);
     }
     println!("product is {:?}", position * depth);
 }
