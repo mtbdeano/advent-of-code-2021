@@ -21,6 +21,7 @@ struct Board {
     board: [Pos; 25],
     row_score: [usize; 5],
     col_score: [usize; 5],
+    won: bool,
 }
 
 
@@ -31,29 +32,28 @@ impl Board {
             board: [Pos { number: 0, called: false}; 25],
             row_score: [0; 5],
             col_score: [0; 5],
+            won: false,
         }
     }
 
     fn play(&mut self, n: isize) {
-        for row in 0..5 {
-            for col in 0..5 {
-                if self.board[row * 5 + col].number == n {
-                    // println!("found {:?}", n);
-                    self.board[row * 5 + col].called = true;
-                    self.row_score[row] = self.row_score[row] + 1;
-                    self.col_score[col] = self.col_score[col] + 1;
+        if !self.won {
+            for row in 0..5 {
+                for col in 0..5 {
+                    if self.board[row * 5 + col].number == n {
+                        // println!("found {:?}", n);
+                        self.board[row * 5 + col].called = true;
+                        self.row_score[row] = self.row_score[row] + 1;
+                        self.col_score[col] = self.col_score[col] + 1;
+                    }
+                }
+            }
+            for row in 0..5 {
+                if self.row_score[row] == 5 || self.col_score[row] == 5 {
+                    self.won = true;
                 }
             }
         }
-    }
-
-    fn won(&self) -> bool {
-        for row in 0..5 {
-            if self.row_score[row] == 5 || self.col_score[row] == 5 {
-                return true
-            }
-        }
-        false
     }
 
     fn score(&self, bingo: isize) -> isize {
@@ -97,15 +97,24 @@ fn main() {
     }
 
     println!("boards {:?}", boards.len());
-    
-    for bingo in numbers_called {
+    let mut last_won: usize = 0;
+    let mut last_score:isize = -1;
+
+    'outer: for bingo in numbers_called {
         println!("calling {:?}", bingo);
         for b in 0..boards.len() {
             boards[b].play(bingo);
-            if boards[b].won() {
+            if boards[b].won {
                 println!("board {:?} wins with score {:?}", b, boards[b].score(bingo));
-                return;
+                last_won = b;
+                last_score = boards[b].score(bingo);
+                if boards.iter().all(|b| b.won) {
+                    break 'outer
+                }
             }
         }
+
     }
+    println!("board {:?} last wins with score {:?}", last_won, last_score);
+
 }
