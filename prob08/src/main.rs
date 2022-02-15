@@ -24,6 +24,11 @@ struct Board {
     won: bool,
 }
 
+#[inline]
+fn rc(r:usize, c:usize) -> usize {
+    // internal indexer
+    r * 5 + c
+}
 
 impl Board {
     #[inline]
@@ -36,13 +41,15 @@ impl Board {
         }
     }
 
+
+
     fn play(&mut self, n: isize) {
         if !self.won {
             for row in 0..5 {
                 for col in 0..5 {
-                    if self.board[row * 5 + col].number == n {
+                    if self.board[rc(row, col)].number == n {
                         // println!("found {:?}", n);
-                        self.board[row * 5 + col].called = true;
+                        self.board[rc(row, col)].called = true;
                         self.row_score[row] = self.row_score[row] + 1;
                         self.col_score[col] = self.col_score[col] + 1;
                     }
@@ -60,8 +67,8 @@ impl Board {
         let mut uncalled:isize = 0;
         for row in 0..5 {
             for col in 0..5 {
-                if !self.board[row * 5 + col].called {
-                    uncalled = uncalled + self.board[row * 5 + col].number;
+                if !self.board[rc(row, col)].called {
+                    uncalled = uncalled + self.board[rc(row, col)].number;
                 }
             }
         }
@@ -88,7 +95,7 @@ fn main() {
             let nums: Vec<isize> = splitter.split(rline.as_str().trim()).map(|s| s.parse::<isize>().unwrap()).collect();
             println!("nums {:?}", nums);
             for col in 0..5 {
-                b.board[row * 5 + col].number = nums[col];
+                b.board[rc(row, col)].number = nums[col];
             }
             line = lines.next();
         }
